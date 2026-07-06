@@ -1,0 +1,18 @@
+[tool.black]
+line-length = 88
+target-version = ["py311"]
+exclude = ".venv"
+
+[tool.ruff]
+line-length = 88
+target-version = "py311"
+exclude = [".venv"]
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "F",   # pyflakes (undefined names, unused imports)
+    "I",   # isort (import ordering)
+    "W",   # pycodestyle warnings
+]
+ignore = ["E501"]  # line too long — Black handles this
