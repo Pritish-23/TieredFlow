@@ -1,9 +1,10 @@
 import logging
-from datetime import datetime
-from core.state import TieredFlowState
-from config.constants import MODELS
-from providers import get_provider
+from datetime import datetime, timezone
+
 from cache.semantic_cache import get_cache
+from config.constants import MODELS
+from core.state import TieredFlowState
+from providers import get_provider
 
 logger = logging.getLogger(__name__)
 
@@ -24,6 +25,7 @@ def llm_call_node(state: TieredFlowState) -> TieredFlowState:
     except Exception as e:
         logger.error(f"[LLM] Call failed: {e}. Falling back to POWER tier.")
         from config.constants import Tier
+
         provider = get_provider(Tier.POWER)
         response = provider.call(
             prompt=state["user_query"],
@@ -33,16 +35,15 @@ def llm_call_node(state: TieredFlowState) -> TieredFlowState:
         tier = Tier.POWER
         meta = MODELS[tier]
 
-    cost_usd = (
-        (response.input_tokens  / 1000) * meta.cost_per_1k_input +
-        (response.output_tokens / 1000) * meta.cost_per_1k_output
-    )
+    cost_usd = (response.input_tokens / 1000) * meta.cost_per_1k_input + (
+        response.output_tokens / 1000
+    ) * meta.cost_per_1k_output
 
     new_total_calls = state["total_calls"] + 1
 
     log_entry = {
         "call_number": new_total_calls,
-        "timestamp": datetime.now(datetime.timezone.utc).isoformat(),
+        "timestamp": datetime.now(timezone.utc).isoformat(),
         "query_snippet": state["user_query"][:80],
         "task_type": state.get("task_type"),
         "tier": tier,

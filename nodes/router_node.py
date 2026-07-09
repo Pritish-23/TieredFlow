@@ -1,18 +1,28 @@
 import logging
+
+from config.constants import TASK_DEFAULT_TIER, TaskType, Tier
 from core.state import TieredFlowState
-from config.constants import Tier, TaskType, MODELS, TASK_DEFAULT_TIER
 
 logger = logging.getLogger(__name__)
 
 
 _TASK_PATTERNS: list[tuple[TaskType, list[str]]] = [
-    (TaskType.CLASSIFICATION,  ["classify", "categorize", "label", "is this", "what type"]),
-    (TaskType.EXTRACTION,      ["extract", "pull out", "find all", "list all", "get the"]),
-    (TaskType.SUMMARIZATION,   ["summarize", "summary", "tldr", "brief", "shorten"]),
-    (TaskType.CODE_GENERATION, ["write code", "implement", "function", "class", "script", "debug"]),
-    (TaskType.REASONING,       ["why", "explain", "analyze", "compare", "evaluate", "reason"]),
-    (TaskType.CREATIVE,        ["write a story", "poem", "creative", "imagine", "generate"]),
-    (TaskType.QA,              ["what is", "who is", "when did", "how do", "define"]),
+    (
+        TaskType.CLASSIFICATION,
+        ["classify", "categorize", "label", "is this", "what type"],
+    ),
+    (TaskType.EXTRACTION, ["extract", "pull out", "find all", "list all", "get the"]),
+    (TaskType.SUMMARIZATION, ["summarize", "summary", "tldr", "brief", "shorten"]),
+    (
+        TaskType.CODE_GENERATION,
+        ["write code", "implement", "function", "class", "script", "debug"],
+    ),
+    (
+        TaskType.REASONING,
+        ["why", "explain", "analyze", "compare", "evaluate", "reason"],
+    ),
+    (TaskType.CREATIVE, ["write a story", "poem", "creative", "imagine", "generate"]),
+    (TaskType.QA, ["what is", "who is", "when did", "how do", "define"]),
 ]
 
 

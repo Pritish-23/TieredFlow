@@ -1,8 +1,9 @@
-import uuid
 import logging
-import numpy as np
+import uuid
 from dataclasses import dataclass
 from typing import Optional
+
+import numpy as np
 
 logger = logging.getLogger(__name__)
 
@@ -37,6 +38,7 @@ class SemanticCache:
         if self._model is None:
             logger.info("[Cache] Loading sentence-transformer model...")
             from sentence_transformers import SentenceTransformer
+
             self._model = SentenceTransformer("all-MiniLM-L6-v2")
             logger.info("[Cache] Model loaded.")
 
@@ -83,7 +85,9 @@ class SemanticCache:
             cost_usd=cost_usd,
         )
         self._entries.append(entry)
-        logger.info(f"[Cache] Stored entry {entry.query_id}. Total: {len(self._entries)}")
+        logger.info(
+            f"[Cache] Stored entry {entry.query_id}. Total: {len(self._entries)}"
+        )
         return entry.query_id
 
     @property
@@ -98,6 +102,7 @@ def get_cache() -> SemanticCache:
     global _cache_instance
     if _cache_instance is None:
         from config.settings import settings
+
         _cache_instance = SemanticCache(
             similarity_high=settings.cache_similarity_high,
             similarity_mid=settings.cache_similarity_mid,
