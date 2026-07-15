@@ -1,5 +1,7 @@
 import logging
+
 import requests
+
 from config.settings import settings
 
 logger = logging.getLogger(__name__)
@@ -16,7 +18,7 @@ class WeatherTool:
             response = requests.get(
                 BASE_URL,
                 params={
-                    "q":     location,
+                    "q": location,
                     "appid": settings.openweathermap_api_key,
                     "units": "metric",
                 },
@@ -32,13 +34,13 @@ class WeatherTool:
             response.raise_for_status()
             data = response.json()
 
-            name        = data["name"]
-            country     = data["sys"]["country"]
-            temp        = data["main"]["temp"]
-            feels_like  = data["main"]["feels_like"]
-            humidity    = data["main"]["humidity"]
+            name = data["name"]
+            country = data["sys"]["country"]
+            temp = data["main"]["temp"]
+            feels_like = data["main"]["feels_like"]
+            humidity = data["main"]["humidity"]
             description = data["weather"][0]["description"].capitalize()
-            wind_speed  = data["wind"]["speed"]
+            wind_speed = data["wind"]["speed"]
 
             return (
                 f"Weather in {name}, {country}\n"
@@ -62,9 +64,22 @@ class WeatherTool:
         query_lower = query.lower()
 
         cities = [
-            "mumbai", "delhi", "bangalore", "hyderabad", "chennai",
-            "kolkata", "pune", "london", "new york", "tokyo", "dubai",
-            "paris", "singapore", "sydney", "los angeles", "chicago",
+            "mumbai",
+            "delhi",
+            "bangalore",
+            "hyderabad",
+            "chennai",
+            "kolkata",
+            "pune",
+            "london",
+            "new york",
+            "tokyo",
+            "dubai",
+            "paris",
+            "singapore",
+            "sydney",
+            "los angeles",
+            "chicago",
         ]
 
         for city in cities:

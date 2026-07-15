@@ -1,5 +1,9 @@
-import streamlit as st
 import os
+
+import pandas as pd
+import streamlit as st
+
+from config.constants import MODELS
 from memory.store import get_store
 
 st.set_page_config(page_title="Settings — TieredFlow", page_icon="⚙️", layout="wide")
@@ -64,7 +68,7 @@ if cache_mid >= cache_high:
 else:
     if st.button("💾 Save Cache Settings", type="primary"):
         st.session_state.cache_high = cache_high
-        st.session_state.cache_mid  = cache_mid
+        st.session_state.cache_mid = cache_mid
         st.success("Cache thresholds updated.")
 
 st.divider()
@@ -75,20 +79,20 @@ st.divider()
 st.subheader("🤖 Model Tiers")
 st.markdown("Current tier → model mapping:")
 
-from config.constants import MODELS, Tier
-
 tier_data = []
 for tier, meta in MODELS.items():
-    tier_data.append({
-        "Tier":          tier.value,
-        "Model":         meta.model_id,
-        "Provider":      meta.provider,
-        "Cost/1K Input": f"${meta.cost_per_1k_input:.5f}",
-        "Cost/1K Output":f"${meta.cost_per_1k_output:.5f}",
-        "Avg Latency":   f"{meta.avg_latency_ms}ms",
-    })
+    tier_data.append(
+        {
+            "Tier": tier.value,
+            "Model": meta.model_id,
+            "Provider": meta.provider,
+            "Cost/1K Input": f"${meta.cost_per_1k_input:.5f}",
+            "Cost/1K Output": f"${meta.cost_per_1k_output:.5f}",
+            "Avg Latency": f"{meta.avg_latency_ms}ms",
+        }
+    )
 
-import pandas as pd
+
 st.dataframe(pd.DataFrame(tier_data), use_container_width=True, hide_index=True)
 
 st.divider()

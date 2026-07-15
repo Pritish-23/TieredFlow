@@ -68,28 +68,28 @@ class TaskType(str, Enum):
     CODE_GENERATION = "code_generation"
     CREATIVE = "creative"
     QA = "qa"
-    REALTIME_QA     = "realtime_qa"
-    WIKIPEDIA       = "wikipedia"      
-    CALCULATOR      = "calculator"     
-    DATETIME        = "datetime"       
-    WEATHER         = "weather"        
-    UNKNOWN         = "unknown"
+    REALTIME_QA = "realtime_qa"
+    WIKIPEDIA = "wikipedia"
+    CALCULATOR = "calculator"
+    DATETIME = "datetime"
+    WEATHER = "weather"
+    UNKNOWN = "unknown"
 
 
 TASK_DEFAULT_TIER: dict[TaskType, Tier] = {
-    TaskType.CLASSIFICATION:  Tier.ULTRA_CHEAP,
-    TaskType.EXTRACTION:      Tier.ULTRA_CHEAP,
-    TaskType.CALCULATOR:      Tier.ULTRA_CHEAP,    
-    TaskType.DATETIME:        Tier.ULTRA_CHEAP,   
-    TaskType.SUMMARIZATION:   Tier.MID,
-    TaskType.QA:              Tier.MID,
-    TaskType.WIKIPEDIA:       Tier.MID,            
-    TaskType.WEATHER:         Tier.MID,            
-    TaskType.REALTIME_QA:     Tier.MID,
-    TaskType.CREATIVE:        Tier.QUALITY,
+    TaskType.CLASSIFICATION: Tier.ULTRA_CHEAP,
+    TaskType.EXTRACTION: Tier.ULTRA_CHEAP,
+    TaskType.CALCULATOR: Tier.ULTRA_CHEAP,
+    TaskType.DATETIME: Tier.ULTRA_CHEAP,
+    TaskType.SUMMARIZATION: Tier.MID,
+    TaskType.QA: Tier.MID,
+    TaskType.WIKIPEDIA: Tier.MID,
+    TaskType.WEATHER: Tier.MID,
+    TaskType.REALTIME_QA: Tier.MID,
+    TaskType.CREATIVE: Tier.QUALITY,
     TaskType.CODE_GENERATION: Tier.QUALITY,
-    TaskType.REASONING:       Tier.POWER,
-    TaskType.UNKNOWN:         Tier.MID,
+    TaskType.REASONING: Tier.POWER,
+    TaskType.UNKNOWN: Tier.MID,
 }
 
 

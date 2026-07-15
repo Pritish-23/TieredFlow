@@ -1,7 +1,7 @@
-import sqlite3
 import logging
-from datetime import datetime, timezone
+import sqlite3
 from dataclasses import dataclass
+from datetime import datetime, timezone
 from typing import Optional
 
 logger = logging.getLogger(__name__)
@@ -74,11 +74,14 @@ class ConversationStore:
         """Create a new session record."""
         now = datetime.now(timezone.utc).isoformat()
         with sqlite3.connect(self.db_path) as conn:
-            conn.execute("""
+            conn.execute(
+                """
                 INSERT OR IGNORE INTO sessions
                 (session_id, started_at, last_active, total_cost_usd, total_messages)
                 VALUES (?, ?, ?, 0.0, 0)
-            """, (session_id, now, now))
+            """,
+                (session_id, now, now),
+            )
             conn.commit()
         logger.info(f"[Store] Session created: {session_id}")
 
@@ -97,22 +100,36 @@ class ConversationStore:
         """Save a message and update session totals."""
         now = datetime.now(timezone.utc).isoformat()
         with sqlite3.connect(self.db_path) as conn:
-            conn.execute("""
+            conn.execute(
+                """
                 INSERT INTO messages
                 (session_id, user_query, response, task_type, tier, model_id,
                  cost_usd, latency_ms, served_from_cache, timestamp)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """, (
-                session_id, user_query, response, task_type, tier, model_id,
-                cost_usd, latency_ms, int(served_from_cache), now,
-            ))
-            conn.execute("""
+            """,
+                (
+                    session_id,
+                    user_query,
+                    response,
+                    task_type,
+                    tier,
+                    model_id,
+                    cost_usd,
+                    latency_ms,
+                    int(served_from_cache),
+                    now,
+                ),
+            )
+            conn.execute(
+                """
                 UPDATE sessions
                 SET last_active    = ?,
                     total_cost_usd = total_cost_usd + ?,
                     total_messages = total_messages + 1
                 WHERE session_id = ?
-            """, (now, cost_usd, session_id))
+            """,
+                (now, cost_usd, session_id),
+            )
             conn.commit()
         logger.info(f"[Store] Message saved for session {session_id}")
 
@@ -130,14 +147,17 @@ class ConversationStore:
     def get_session_messages(self, session_id: str) -> list[Message]:
         """Return all messages for a given session."""
         with sqlite3.connect(self.db_path) as conn:
-            rows = conn.execute("""
+            rows = conn.execute(
+                """
                 SELECT message_id, session_id, user_query, response,
                        task_type, tier, model_id, cost_usd, latency_ms,
                        served_from_cache, timestamp
                 FROM messages
                 WHERE session_id = ?
                 ORDER BY message_id ASC
-            """, (session_id,)).fetchall()
+            """,
+                (session_id,),
+            ).fetchall()
         return [Message(*row) for row in rows]
 
     def delete_session(self, session_id: str):

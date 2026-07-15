@@ -1,4 +1,5 @@
 import logging
+
 import wikipediaapi
 
 logger = logging.getLogger(__name__)
@@ -7,10 +8,7 @@ logger = logging.getLogger(__name__)
 class WikipediaTool:
 
     def __init__(self):
-        self._wiki = wikipediaapi.Wikipedia(
-            language="en",
-            user_agent="TieredFlow/1.0"
-        )
+        self._wiki = wikipediaapi.Wikipedia(language="en", user_agent="TieredFlow/1.0")
 
     def search(self, query: str) -> str:
         logger.info(f"[Wiki] Searching: {query}")

@@ -1,6 +1,8 @@
 import time
 from typing import Iterator
+
 from groq import Groq
+
 from config.settings import settings
 from providers.base import BaseProvider, LLMResponse
 
@@ -11,7 +13,9 @@ class GroqProvider(BaseProvider):
         self.model_id = model_id
         self._client = Groq(api_key=settings.groq_api_key)
 
-    def call(self, prompt: str, system: str = "", max_tokens: int = 1024) -> LLMResponse:
+    def call(
+        self, prompt: str, system: str = "", max_tokens: int = 1024
+    ) -> LLMResponse:
         start = time.time()
 
         response = self._client.chat.completions.create(
@@ -19,7 +23,7 @@ class GroqProvider(BaseProvider):
             max_tokens=max_tokens,
             messages=[
                 {"role": "system", "content": system or "You are a helpful assistant."},
-                {"role": "user",   "content": prompt},
+                {"role": "user", "content": prompt},
             ],
         )
 
@@ -35,14 +39,16 @@ class GroqProvider(BaseProvider):
             provider="groq",
         )
 
-    def stream(self, prompt: str, system: str = "", max_tokens: int = 1024) -> Iterator[str]:
+    def stream(
+        self, prompt: str, system: str = "", max_tokens: int = 1024
+    ) -> Iterator[str]:
         response = self._client.chat.completions.create(
             model=self.model_id,
             max_tokens=max_tokens,
             stream=True,
             messages=[
                 {"role": "system", "content": system or "You are a helpful assistant."},
-                {"role": "user",   "content": prompt},
+                {"role": "user", "content": prompt},
             ],
         )
 

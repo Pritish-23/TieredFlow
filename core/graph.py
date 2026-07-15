@@ -1,8 +1,8 @@
 import sqlite3
+
 from langgraph.checkpoint.sqlite import SqliteSaver
 from langgraph.graph import END, START, StateGraph
 
-from nodes.query_rewriter import query_rewriter_node
 from core.state import TieredFlowState
 from nodes.cache_node import (
     auto_serve_cache_node,
@@ -19,6 +19,7 @@ from nodes.human_override import (
     route_after_cache_hitl,
 )
 from nodes.llm_node import llm_call_node
+from nodes.query_rewriter import query_rewriter_node
 from nodes.router_node import (
     route_after_router,
     router_node,
@@ -58,8 +59,8 @@ def build_graph():
         "cache_lookup",
         route_after_cache,
         {
-            "router":               "query_rewriter",
-            "auto_serve_cache":     "auto_serve_cache",
+            "router": "query_rewriter",
+            "auto_serve_cache": "auto_serve_cache",
             "human_cache_decision": "human_cache_decision",
         },
     )
@@ -83,7 +84,7 @@ def build_graph():
         route_after_router,
         {
             "human_tier_override": "human_tier_override",
-            "llm_call":            "llm_call",
+            "llm_call": "llm_call",
         },
     )
 

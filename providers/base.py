@@ -23,7 +23,9 @@ class BaseProvider(ABC):
     ) -> LLMResponse: ...
 
     @abstractmethod
-    def stream(self, prompt: str, system: str = "", max_tokens: int = 1024) -> Iterator[str]:
+    def stream(
+        self, prompt: str, system: str = "", max_tokens: int = 1024
+    ) -> Iterator[str]:
         """Yield response chunks as they arrive."""
         ...
 

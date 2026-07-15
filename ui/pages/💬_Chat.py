@@ -1,8 +1,10 @@
 import uuid
+
 import streamlit as st
+
+from config.settings import settings
 from core.graph import graph
 from core.state import initial_state
-from config.settings import settings
 from memory.store import get_store
 
 st.set_page_config(page_title="Chat — TieredFlow", page_icon="💬", layout="wide")
@@ -28,12 +30,10 @@ with st.sidebar:
     st.header("⚙️ Session")
     st.metric("Session ID", st.session_state.session_id)
 
-    budget_remaining = max(
-        st.session_state.budget - st.session_state.total_cost, 0.0
-    )
+    budget_remaining = max(st.session_state.budget - st.session_state.total_cost, 0.0)
     st.metric("Budget Remaining", f"${budget_remaining:.4f}")
-    st.metric("Total Cost",       f"${st.session_state.total_cost:.6f}")
-    st.metric("Total Messages",   len(st.session_state.messages))
+    st.metric("Total Cost", f"${st.session_state.total_cost:.6f}")
+    st.metric("Total Messages", len(st.session_state.messages))
 
     st.divider()
 
@@ -44,9 +44,9 @@ with st.sidebar:
     st.divider()
 
     if st.button("🆕 New Session", use_container_width=True):
-        st.session_state.session_id  = str(uuid.uuid4())[:8]
-        st.session_state.messages    = []
-        st.session_state.total_cost  = 0.0
+        st.session_state.session_id = str(uuid.uuid4())[:8]
+        st.session_state.messages = []
+        st.session_state.total_cost = 0.0
         st.rerun()
 
 
@@ -76,7 +76,9 @@ for msg in st.session_state.messages:
             cols[0].caption(f"🧠 **Task:** {task}")
             cols[1].caption(f"⚡ **Tier:** {tier}")
             cols[2].caption(f"💰 **Cost:** ${cost:.6f}")
-            cols[3].caption(f"⏱️ **Latency:** {latency}ms" if latency else "⏱️ **Latency:** —")
+            cols[3].caption(
+                f"⏱️ **Latency:** {latency}ms" if latency else "⏱️ **Latency:** —"
+            )
             cols[4].caption(f"{'🟢 Cache hit' if cached else '🔵 Fresh call'}")
 
 
@@ -93,8 +95,8 @@ if query:
     # Run graph
     with st.chat_message("assistant"):
         thread_id = f"{st.session_state.session_id}-{len(st.session_state.messages)}"
-        config    = {"configurable": {"thread_id": thread_id}}
-        state     = initial_state(
+        config = {"configurable": {"thread_id": thread_id}}
+        state = initial_state(
             query,
             st.session_state.session_id,
             max(st.session_state.budget - st.session_state.total_cost, 0.0),
@@ -111,10 +113,13 @@ if query:
         else:
             # Stream fresh LLM response
             from providers import get_provider
-            tier     = result.get("selected_tier")
+
+            tier = result.get("selected_tier")
             provider = get_provider(tier)
-            system   = result.get("system_prompt") or "You are a helpful, concise assistant."
-            prompt   = result.get("rewritten_query") or query
+            system = (
+                result.get("system_prompt") or "You are a helpful, concise assistant."
+            )
+            prompt = result.get("rewritten_query") or query
 
             def stream_response():
                 for chunk in provider.stream(
@@ -125,29 +130,33 @@ if query:
                     yield chunk
 
             response = st.write_stream(stream_response())
-            
+
         # Metadata badge
-        meta  = result
-        task  = str(meta.get("task_type", "—")).replace("TaskType.", "")
-        tier  = str(meta.get("selected_tier", "—")).replace("Tier.", "")
-        cost  = meta.get("cost_usd") or 0.0
+        meta = result
+        task = str(meta.get("task_type", "—")).replace("TaskType.", "")
+        tier = str(meta.get("selected_tier", "—")).replace("Tier.", "")
+        cost = meta.get("cost_usd") or 0.0
         latency = meta.get("latency_ms")
-        cached  = meta.get("served_from_cache", False)
+        cached = meta.get("served_from_cache", False)
 
         cols = st.columns(5)
         cols[0].caption(f"🧠 **Task:** {task}")
         cols[1].caption(f"⚡ **Tier:** {tier}")
         cols[2].caption(f"💰 **Cost:** ${cost:.6f}")
-        cols[3].caption(f"⏱️ **Latency:** {latency}ms" if latency else "⏱️ **Latency:** —")
+        cols[3].caption(
+            f"⏱️ **Latency:** {latency}ms" if latency else "⏱️ **Latency:** —"
+        )
         cols[4].caption(f"{'🟢 Cache hit' if cached else '🔵 Fresh call'}")
 
     # Update session state
     st.session_state.total_cost += cost
-    st.session_state.messages.append({
-        "role": "assistant",
-        "content": response,
-        "meta": result,
-    })
+    st.session_state.messages.append(
+        {
+            "role": "assistant",
+            "content": response,
+            "meta": result,
+        }
+    )
 
     # Save to persistent store
     store = get_store()

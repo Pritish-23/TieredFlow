@@ -1,5 +1,7 @@
 import logging
+
 from tavily import TavilyClient
+
 from config.settings import settings
 
 logger = logging.getLogger(__name__)

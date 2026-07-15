@@ -1,6 +1,6 @@
 import logging
-from datetime import datetime, timezone
 import zoneinfo
+from datetime import datetime, timezone
 
 logger = logging.getLogger(__name__)
 
@@ -41,15 +41,15 @@ class DateTimeTool:
         query_lower = query.lower()
 
         timezone_map = {
-            "india":     "Asia/Kolkata",
-            "mumbai":    "Asia/Kolkata",
-            "delhi":     "Asia/Kolkata",
-            "new york":  "America/New_York",
-            "london":    "Europe/London",
-            "tokyo":     "Asia/Tokyo",
-            "sydney":    "Australia/Sydney",
-            "dubai":     "Asia/Dubai",
-            "paris":     "Europe/Paris",
+            "india": "Asia/Kolkata",
+            "mumbai": "Asia/Kolkata",
+            "delhi": "Asia/Kolkata",
+            "new york": "America/New_York",
+            "london": "Europe/London",
+            "tokyo": "Asia/Tokyo",
+            "sydney": "Australia/Sydney",
+            "dubai": "Asia/Dubai",
+            "paris": "Europe/Paris",
             "singapore": "Asia/Singapore",
         }
 

@@ -22,10 +22,14 @@ LLM based on task complexity, budget, and semantic cache hits.
 col1, col2, col3, col4 = st.columns(4)
 
 with col1:
-    st.info("💬 **Chat**\nSend queries and get responses with full routing transparency")
+    st.info(
+        "💬 **Chat**\nSend queries and get responses with full routing transparency"
+    )
 
 with col2:
-    st.info("📊 **Analytics**\nTrack cost, latency and tier distribution for current session")
+    st.info(
+        "📊 **Analytics**\nTrack cost, latency and tier distribution for current session"
+    )
 
 with col3:
     st.info("🗄️ **History**\nBrowse past sessions with per-session analysis")

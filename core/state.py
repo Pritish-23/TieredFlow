@@ -8,7 +8,7 @@ class TieredFlowState(TypedDict):
     # Input
     user_query: str
     session_id: str
-    original_query: Optional[str] 
+    original_query: Optional[str]
     rewritten_query: Optional[str]
     system_prompt: Optional[str]
 
@@ -56,7 +56,7 @@ def initial_state(user_query: str, session_id: str, budget: float) -> TieredFlow
     return TieredFlowState(
         user_query=user_query,
         session_id=session_id,
-        original_query=user_query,   
+        original_query=user_query,
         rewritten_query=None,
         guardrail_passed=None,
         guardrail_reason=None,

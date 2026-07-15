@@ -13,7 +13,7 @@ class CalculatorTool:
         try:
             # Clean the expression
             cleaned = expression.strip()
-            cleaned = re.sub(r'[^0-9+\-*/().%^ ]', '', cleaned)
+            cleaned = re.sub(r"[^0-9+\-*/().%^ ]", "", cleaned)
             cleaned = cleaned.replace("^", "**")
 
             if not cleaned:
@@ -21,11 +21,17 @@ class CalculatorTool:
 
             # Safe eval with only math functions allowed
             allowed = {
-                "abs": abs, "round": round,
-                "sqrt": math.sqrt, "pow": math.pow,
-                "log": math.log, "log10": math.log10,
-                "sin": math.sin, "cos": math.cos, "tan": math.tan,
-                "pi": math.pi, "e": math.e,
+                "abs": abs,
+                "round": round,
+                "sqrt": math.sqrt,
+                "pow": math.pow,
+                "log": math.log,
+                "log10": math.log10,
+                "sin": math.sin,
+                "cos": math.cos,
+                "tan": math.tan,
+                "pi": math.pi,
+                "e": math.e,
             }
 
             result = eval(cleaned, {"__builtins__": {}}, allowed)

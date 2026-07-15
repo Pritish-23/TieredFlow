@@ -17,21 +17,21 @@ def llm_call_node(state: TieredFlowState) -> TieredFlowState:
     logger.info(f"[LLM] Calling {meta.model_id} (tier={tier})")
 
     from config.constants import TaskType
-    from tools.search_tool import get_search_tool
-    from tools.wiki_tool import get_wiki_tool
     from tools.calculator_tool import get_calculator_tool
     from tools.datetime_tool import get_datetime_tool
+    from tools.search_tool import get_search_tool
     from tools.weather_tool import get_weather_tool
+    from tools.wiki_tool import get_wiki_tool
 
-    prompt     = state["user_query"]
-    system     = "You are a helpful, concise assistant."
-    task_type  = state.get("task_type")
+    prompt = state["user_query"]
+    system = "You are a helpful, concise assistant."
+    task_type = state.get("task_type")
 
     # ── Tool dispatcher ───────────────────────────────────────────────────────
     if task_type == TaskType.REALTIME_QA:
         logger.info("[LLM] Tool: WebSearch")
         results = get_search_tool().search(prompt)
-        system  = (
+        system = (
             "You are a helpful assistant with access to live web search results. "
             "Answer using the search results below.\n\n"
             f"Search Results:\n{results}"
@@ -39,9 +39,9 @@ def llm_call_node(state: TieredFlowState) -> TieredFlowState:
 
     elif task_type == TaskType.WIKIPEDIA:
         logger.info("[LLM] Tool: Wikipedia")
-        wiki    = get_wiki_tool()
+        wiki = get_wiki_tool()
         results = wiki.search(prompt)
-        system  = (
+        system = (
             "You are a helpful assistant with access to Wikipedia. "
             "Answer using the Wikipedia content below.\n\n"
             f"Wikipedia Content:\n{results}"
@@ -49,9 +49,9 @@ def llm_call_node(state: TieredFlowState) -> TieredFlowState:
 
     elif task_type == TaskType.CALCULATOR:
         logger.info("[LLM] Tool: Calculator")
-        calc    = get_calculator_tool()
+        calc = get_calculator_tool()
         results = calc.calculate(prompt)
-        system  = (
+        system = (
             "You are a helpful assistant with a calculator. "
             "Use the calculation result below to answer the user.\n\n"
             f"Calculation Result:\n{results}"
@@ -59,10 +59,10 @@ def llm_call_node(state: TieredFlowState) -> TieredFlowState:
 
     elif task_type == TaskType.DATETIME:
         logger.info("[LLM] Tool: DateTime")
-        dt_tool  = get_datetime_tool()
-        tz_str  = dt_tool.extract_timezone(prompt) 
+        dt_tool = get_datetime_tool()
+        tz_str = dt_tool.extract_timezone(prompt)
         results = dt_tool.get_current_datetime(tz_str)
-        system   = (
+        system = (
             "You are a helpful assistant with access to current date and time. "
             "Answer using the datetime information below.\n\n"
             f"DateTime Info:\n{results}"
@@ -70,10 +70,10 @@ def llm_call_node(state: TieredFlowState) -> TieredFlowState:
 
     elif task_type == TaskType.WEATHER:
         logger.info("[LLM] Tool: Weather")
-        weather  = get_weather_tool()
+        weather = get_weather_tool()
         location = weather.extract_location(prompt)
-        results  = weather.get_weather(location)
-        system   = (
+        results = weather.get_weather(location)
+        system = (
             "You are a helpful assistant with access to live weather data. "
             "Answer using the weather information below.\n\n"
             f"Weather Data:\n{results}"
@@ -89,6 +89,7 @@ def llm_call_node(state: TieredFlowState) -> TieredFlowState:
     except Exception as e:
         logger.error(f"[LLM] Call failed: {e}. Falling back to POWER tier.")
         from config.constants import Tier
+
         provider = get_provider(Tier.POWER)
         response = provider.call(
             prompt=prompt,
@@ -139,7 +140,7 @@ def llm_call_node(state: TieredFlowState) -> TieredFlowState:
         "tokens_used_output": response.output_tokens,
         "cost_usd": round(cost_usd, 6),
         "latency_ms": response.latency_ms,
-        "system_prompt": system,                    # ← add this
+        "system_prompt": system,  # ← add this
         "budget_remaining_usd": max(state["budget_remaining_usd"] - cost_usd, 0.0),
         "total_cost_usd": round(state["total_cost_usd"] + cost_usd, 6),
         "total_calls": new_total_calls,
