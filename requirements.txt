@@ -24,3 +24,6 @@ pytest-asyncio
 tavily-python
 aiosqlite
 langgraph-checkpoint-sqlite
+
+wikipedia
+wikipedia-api

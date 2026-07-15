@@ -11,7 +11,11 @@ logger = logging.getLogger(__name__)
 
 
 _TASK_PATTERNS: list[tuple[TaskType, list[str]]] = [
-    (TaskType.REALTIME_QA,     ["current", "latest", "today", "news", "right now", "recently", "this week", "price of", "weather"]),
+    (TaskType.REALTIME_QA,     ["current", "latest", "today", "news", "right now", "recently", "this week", "price of", "weather in"]),
+    (TaskType.WEATHER,         ["weather", "temperature", "forecast", "raining", "humidity", "wind"]),
+    (TaskType.DATETIME,        ["what time", "what day", "today's date", "current time", "timezone", "what year", "day is it"]),
+    (TaskType.CALCULATOR,      ["calculate", "compute", "how much is", "what is the result", "convert", "how many", "percentage", "multiply", "divide", "add", "subtract"]),
+    (TaskType.WIKIPEDIA,       ["who is", "who was", "history of", "tell me about", "biography", "what was"]),
     (TaskType.CLASSIFICATION,  ["classify", "categorize", "label", "is this", "what type"]),
     (TaskType.EXTRACTION,      ["extract", "pull out", "find all", "list all", "get the"]),
     (TaskType.SUMMARIZATION,   ["summarize", "summary", "tldr", "brief", "shorten"]),

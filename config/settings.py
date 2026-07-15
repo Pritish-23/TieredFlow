@@ -17,6 +17,7 @@ class Settings(BaseSettings):
     openai_api_key: str = Field(..., alias="OPENAI_API_KEY")
     groq_api_key: str = Field(..., alias="GROQ_API_KEY")
     tavily_api_key: str = Field(..., alias="TAVILY_API_KEY")
+    openweathermap_api_key: str = Field("", alias="OPENWEATHERMAP_API_KEY")
 
     # LangSmith
     langchain_tracing_v2: bool = Field(True, alias="LANGCHAIN_TRACING_V2")
