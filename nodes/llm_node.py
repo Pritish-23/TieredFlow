@@ -139,6 +139,7 @@ def llm_call_node(state: TieredFlowState) -> TieredFlowState:
         "tokens_used_output": response.output_tokens,
         "cost_usd": round(cost_usd, 6),
         "latency_ms": response.latency_ms,
+        "system_prompt": system,                    # ← add this
         "budget_remaining_usd": max(state["budget_remaining_usd"] - cost_usd, 0.0),
         "total_cost_usd": round(state["total_cost_usd"] + cost_usd, 6),
         "total_calls": new_total_calls,

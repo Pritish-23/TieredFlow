@@ -92,19 +92,40 @@ if query:
 
     # Run graph
     with st.chat_message("assistant"):
-        with st.spinner("Thinking..."):
-            thread_id = f"{st.session_state.session_id}-{len(st.session_state.messages)}"
-            config    = {"configurable": {"thread_id": thread_id}}
-            state     = initial_state(
-                query,
-                st.session_state.session_id,
-                max(st.session_state.budget - st.session_state.total_cost, 0.0),
-            )
+        thread_id = f"{st.session_state.session_id}-{len(st.session_state.messages)}"
+        config    = {"configurable": {"thread_id": thread_id}}
+        state     = initial_state(
+            query,
+            st.session_state.session_id,
+            max(st.session_state.budget - st.session_state.total_cost, 0.0),
+        )
+
+        with st.spinner("Routing query..."):
             result = graph.invoke(state, config=config)
 
         response = result.get("final_response", "No response.")
-        st.markdown(response)
 
+        if result.get("served_from_cache"):
+            # Instant display for cache hits
+            st.markdown(response)
+        else:
+            # Stream fresh LLM response
+            from providers import get_provider
+            tier     = result.get("selected_tier")
+            provider = get_provider(tier)
+            system   = result.get("system_prompt") or "You are a helpful, concise assistant."
+            prompt   = result.get("rewritten_query") or query
+
+            def stream_response():
+                for chunk in provider.stream(
+                    prompt=prompt,
+                    system=system,
+                    max_tokens=1024,
+                ):
+                    yield chunk
+
+            response = st.write_stream(stream_response())
+            
         # Metadata badge
         meta  = result
         task  = str(meta.get("task_type", "—")).replace("TaskType.", "")
