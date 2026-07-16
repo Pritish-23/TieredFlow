@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
+from typing import Iterator, Optional
 
 
 @dataclass
@@ -15,19 +16,13 @@ class LLMResponse:
 class BaseProvider(ABC):
 
     @abstractmethod
-    def call(
-        self,
-        prompt: str,
-        system: str = "",
-        max_tokens: int = 1024,
-    ) -> LLMResponse: ...
-
-    @abstractmethod
-    def stream(
-        self, prompt: str, system: str = "", max_tokens: int = 1024
-    ) -> Iterator[str]:
-        """Yield response chunks as they arrive."""
+    def call(self, prompt: str, system: str = "", max_tokens: int = 1024, history: Optional[list] = None) -> LLMResponse:
         ...
 
     @abstractmethod
-    def is_available(self) -> bool: ...
+    def stream(self, prompt: str, system: str = "", max_tokens: int = 1024, history: Optional[list] = None) -> Iterator[str]:
+        ...
+
+    @abstractmethod
+    def is_available(self) -> bool:
+        ...

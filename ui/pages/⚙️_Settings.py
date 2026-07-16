@@ -97,6 +97,30 @@ st.dataframe(pd.DataFrame(tier_data), use_container_width=True, hide_index=True)
 
 st.divider()
 
+# ── Query Rewriting ─────────────────────────────────────────────────────────
+
+st.subheader("🔄 Query Rewriting")
+
+query_mode_labels = {
+    "auto":     "Auto (always use rewritten query)",
+    "original": "Always use original query (skip rewriting)",
+    "ask":      "Ask me each time",
+}
+
+current_mode = st.session_state.get("query_mode", "auto")
+
+selected_label = st.radio(
+    "How should TieredFlow handle query rewriting?",
+    options=list(query_mode_labels.values()),
+    index=list(query_mode_labels.keys()).index(current_mode),
+)
+
+# Map back to internal value
+selected_mode = [k for k, v in query_mode_labels.items() if v == selected_label][0]
+st.session_state.query_mode = selected_mode
+
+st.caption(f"Current mode: `{selected_mode}`")
+
 
 # ── LangSmith ─────────────────────────────────────────────────────────────────
 

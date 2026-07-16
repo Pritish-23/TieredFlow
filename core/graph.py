@@ -4,6 +4,10 @@ from langgraph.checkpoint.sqlite import SqliteSaver
 from langgraph.graph import END, START, StateGraph
 
 from core.state import TieredFlowState
+from nodes.human_rewrite_decision import ( 
+    human_rewrite_decision_node, 
+    route_after_rewrite 
+)
 from nodes.cache_node import (
     auto_serve_cache_node,
     cache_lookup_node,
@@ -40,6 +44,7 @@ def build_graph():
     builder.add_node("human_tier_override", human_tier_override_node)
     builder.add_node("llm_call", llm_call_node)
     builder.add_node("query_rewriter", query_rewriter_node)
+    builder.add_node("human_rewrite_decision", human_rewrite_decision_node)
 
     # Entry point
     builder.add_edge(START, "guardrail")
@@ -76,7 +81,16 @@ def build_graph():
     )
 
     # Query rewriter → router
-    builder.add_edge("query_rewriter", "router")
+    builder.add_conditional_edges(
+        "query_rewriter",
+        route_after_rewrite,
+        {
+            "human_rewrite_decision": "human_rewrite_decision",
+            "router": "router",
+        },
+    )
+
+    builder.add_edge("human_rewrite_decision", "router")
 
     # Router → conditional
     builder.add_conditional_edges(
@@ -99,7 +113,7 @@ def build_graph():
     checkpointer = SqliteSaver(conn)
     return builder.compile(
         checkpointer=checkpointer,
-        interrupt_before=["human_cache_decision", "human_tier_override"],
+        interrupt_before=["human_cache_decision", "human_tier_override", "human_rewrite_decision"],
     )
 
 

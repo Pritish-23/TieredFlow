@@ -31,6 +31,9 @@ class Settings(BaseSettings):
     cache_similarity_high: float = Field(0.92, alias="CACHE_SIMILARITY_HIGH")
     cache_similarity_mid: float = Field(0.75, alias="CACHE_SIMILARITY_MID")
 
+    # Query
+    query_mode: str = Field("auto", alias="QUERY_MODE")  # "auto" | "original" | "ask"
+
 
 # Singleton — import this everywhere
 settings = Settings()

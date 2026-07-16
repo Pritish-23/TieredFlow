@@ -41,11 +41,24 @@ def llm_call_node(state: TieredFlowState) -> TieredFlowState:
         logger.info("[LLM] Tool: Wikipedia")
         wiki = get_wiki_tool()
         results = wiki.search(prompt)
-        system = (
-            "You are a helpful assistant with access to Wikipedia. "
-            "Answer using the Wikipedia content below.\n\n"
-            f"Wikipedia Content:\n{results}"
-        )
+
+        # Validate — if nothing found, fall back to web search + LLM knowledge combined
+        if "No Wikipedia article found" in results or "failed" in results.lower():
+            logger.warning("[LLM] Wikipedia returned no results, falling back to web search + LLM knowledge.")
+            search_results = get_search_tool().search(prompt)
+            system = (
+                "You are a helpful assistant. Wikipedia had no dedicated article for this query. "
+                "Use the web search results below AND your own knowledge to give the most accurate answer. "
+                "If the search results confirm or add to what you know, use them. "
+                "If they conflict with well-established facts, prioritize accuracy over the search snippet.\n\n"
+                f"Web Search Results:\n{search_results}"
+            )
+        else:
+            system = (
+                "You are a helpful assistant with access to Wikipedia. "
+                "Answer using the Wikipedia content below.\n\n"
+                f"Wikipedia Content:\n{results}"
+            )
 
     elif task_type == TaskType.CALCULATOR:
         logger.info("[LLM] Tool: Calculator")
@@ -80,11 +93,14 @@ def llm_call_node(state: TieredFlowState) -> TieredFlowState:
         )
 
     # ── LLM call ──────────────────────────────────────────────────────────────
+    history = state.get("conversation_history", [])
+
     try:
         response = provider.call(
             prompt=prompt,
             system=system,
             max_tokens=1024,
+            history=history,
         )
     except Exception as e:
         logger.error(f"[LLM] Call failed: {e}. Falling back to POWER tier.")
@@ -95,6 +111,7 @@ def llm_call_node(state: TieredFlowState) -> TieredFlowState:
             prompt=prompt,
             system=system,
             max_tokens=1024,
+            history=history,
         )
         tier = Tier.POWER
         meta = MODELS[tier]
