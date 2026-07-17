@@ -6,7 +6,9 @@ from typing import Optional
 
 logger = logging.getLogger(__name__)
 
-DB_PATH = "tieredflow.db"
+from pathlib import Path
+
+DB_PATH = str(Path(__file__).resolve().parent.parent / "tieredflow.db")
 
 
 @dataclass
