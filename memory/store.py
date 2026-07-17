@@ -1,3 +1,7 @@
+from pathlib import Path
+
+DB_PATH = str(Path(__file__).resolve().parent.parent / "tieredflow.db")
+
 import logging
 import sqlite3
 from dataclasses import dataclass
@@ -5,11 +9,6 @@ from datetime import datetime, timezone
 from typing import Optional
 
 logger = logging.getLogger(__name__)
-
-from pathlib import Path
-
-DB_PATH = str(Path(__file__).resolve().parent.parent / "tieredflow.db")
-
 
 @dataclass
 class Message:
