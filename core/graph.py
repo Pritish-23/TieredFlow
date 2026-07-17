@@ -1,5 +1,8 @@
 import sqlite3
 from pathlib import Path
+import tempfile
+
+DB_PATH = str(Path(tempfile.gettempdir()) / "tieredflow.db")
 
 from langgraph.checkpoint.sqlite import SqliteSaver
 from langgraph.graph import END, START, StateGraph
@@ -30,8 +33,6 @@ from nodes.router_node import (
     router_node,
     task_classifier_node,
 )
-
-DB_PATH = str(Path(__file__).resolve().parent.parent / "tieredflow.db")
 
 def build_graph():
     builder = StateGraph(TieredFlowState)

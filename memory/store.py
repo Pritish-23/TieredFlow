@@ -1,6 +1,7 @@
+import tempfile
 from pathlib import Path
 
-DB_PATH = str(Path(__file__).resolve().parent.parent / "tieredflow.db")
+DB_PATH = str(Path(tempfile.gettempdir()) / "tieredflow.db")
 
 import logging
 import sqlite3
