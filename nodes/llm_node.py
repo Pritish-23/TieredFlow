@@ -176,7 +176,7 @@ def llm_call_node(state: TieredFlowState) -> TieredFlowState:
     # ── Store in semantic cache ────────────────────────────────────────────────
     cache = get_cache()
     cache.store(
-        query=state["user_query"],
+        query=state.get("original_query") or state["user_query"],
         response=response.content,
         tier_used=tier,
         cost_usd=cost_usd,
