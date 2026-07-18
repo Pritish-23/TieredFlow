@@ -16,7 +16,6 @@ def llm_call_node(state: TieredFlowState) -> TieredFlowState:
 
     logger.info(f"[LLM] Calling {meta.model_id} (tier={tier})")
 
-    from config.constants import TaskType
     from tools.calculator_tool import get_calculator_tool
     from tools.datetime_tool import get_datetime_tool
     from tools.search_tool import get_search_tool
@@ -131,6 +130,7 @@ def llm_call_node(state: TieredFlowState) -> TieredFlowState:
     if task_type not in SKIP_SCORING_TASKS:
         try:
             from providers.groq_provider import GroqProvider
+
             scorer = GroqProvider(model_id="llama-3.1-8b-instant")
             score_response = scorer.call(
                 prompt=(

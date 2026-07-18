@@ -11,6 +11,7 @@ from typing import Optional
 
 logger = logging.getLogger(__name__)
 
+
 @dataclass
 class Message:
     message_id: int

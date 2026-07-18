@@ -164,18 +164,34 @@ python eval/harness.py
 
 ---
 
-## ☁️ Deployment (Railway)
+## ☁️ Deployment (Streamlit Community Cloud)
+
+TieredFlow is deployed on **Streamlit Community Cloud** — free, purpose-built for Streamlit apps, and zero-config beyond secrets.
 
 1. Push this repo to GitHub.
-2. Create a new project on [Railway](https://railway.app) → **Deploy from GitHub repo**.
-3. Add all `.env` variables under **Variables** in the Railway dashboard (`ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, `GROQ_API_KEY`, `TAVILY_API_KEY`, `OPENWEATHERMAP_API_KEY`, etc.)
-4. Set the start command:
+2. Go to [share.streamlit.io](https://share.streamlit.io) and sign in with GitHub.
+3. Click **"New app"** → select the repo → branch `main` → main file path `ui/app.py`.
+4. Under **Advanced settings**, paste secrets in TOML format:
+   ```toml
+   ANTHROPIC_API_KEY = "..."
+   OPENAI_API_KEY = "..."
+   GROQ_API_KEY = "..."
+   TAVILY_API_KEY = "..."
+   OPENWEATHERMAP_API_KEY = "..."
+   LANGCHAIN_API_KEY = "..."
+   LANGCHAIN_TRACING_V2 = "true"
+   LANGCHAIN_PROJECT = "tieredflow"
    ```
-   streamlit run ui/app.py --server.port $PORT --server.address 0.0.0.0
-   ```
-5. Railway auto-detects the Python environment from `requirements.txt`. Deploy, and Railway will give you a public URL.
+5. Click **Deploy**.
 
-> **Note:** SQLite files (`tieredflow.db`) are ephemeral on most PaaS free tiers unless a persistent volume is attached — sessions may reset on redeploy. For a permanent portfolio demo, consider attaching a Railway volume mounted at the project root.
+`config/settings.py` transparently loads from `st.secrets` on Streamlit Cloud and falls back to a local `.env` file otherwise — the same codebase runs unmodified in both environments.
+
+**Two real deployment issues hit and fixed along the way** (both are good "what would you do differently in production" interview talking points):
+
+- **Multipage import resolution** — Streamlit Cloud executes each page in `ui/pages/` with its own module search path, which doesn't automatically include the project root. Every page now inserts the project root into `sys.path` as the very first statement (before any other import), so `config`, `core`, `nodes`, etc. resolve correctly regardless of which page loads first.
+- **Read-only app source mount** — the cloned repo directory on Streamlit Cloud is not reliably writable, which caused SQLite's `CREATE TABLE` to silently fail (the connection succeeded, but the schema never persisted, surfacing later as `OperationalError: no such table`). Both the LangGraph `SqliteSaver` checkpoint DB and the `ConversationStore` DB now write to the OS temp directory (`tempfile.gettempdir()`) instead of the project root, which is guaranteed writable across environments.
+
+> **Known limitation:** the OS temp directory (like most PaaS free-tier filesystems) is ephemeral — session history and semantic cache reset on app reboot/redeploy. This is an accepted, explainable trade-off for a portfolio demo; a production deployment would instead point `DB_PATH` at a managed Postgres instance or a mounted persistent volume.
 
 ---
 
@@ -203,16 +219,24 @@ Full breakdown available in [`eval/results/eval_results.csv`](eval/results/eval_
 - **Wikipedia tool falls back to combined web search + LLM knowledge, not either alone** — when Wikipedia has no dedicated article, blindly trusting a thin web search result or letting the model guess from memory both risk wrong answers. Combining both lets the model cross-check search snippets against what it already knows.
 - **Three independent HITL interrupt points** (cache-serve decision, tier override, rewrite choice) are implemented as first-class LangGraph interrupts rather than UI-only prompts — meaning the same HITL flow works identically whether invoked from the CLI or the Streamlit UI.
 - **pydantic-settings over `python-dotenv` + `os.environ`** — gives type-safe, validated config loading with clear errors on missing keys, rather than silent `None`s surfacing deep in a provider call.
+- **Semantic cache is keyed on the original query, never the rewritten one** — the query rewriter mutates `state["user_query"]` for the LLM call, but caching under that rewritten text would mean the same original query never matches itself on a repeat ask (two independent rewrites of the same vague query rarely produce identical text). Cache `store()` calls always use `original_query`, keeping lookup and storage aligned on what the user actually typed.
 
 ---
 
 ## 📸 Screenshots
 
-> *(Add screenshots here after your next Streamlit run)*
+**🔗 Live demo:** [tieredflow---a-cost-latency-optimizing-multi-agent-orchestrator.streamlit.app](https://tieredflow---a-cost-latency-optimizing-multi-agent-orchestrator.streamlit.app)
 
-| Chat Page | Analytics Dashboard |
+| | |
 |---|---|
-| ![Chat](docs/screenshots/chat.png) | ![Analytics](docs/screenshots/analytics.png) |
+| **Landing page** — quick nav to all four pages | **Chat — empty state** with example prompts |
+| ![Landing](docs/screenshots/01_landing.png) | ![Chat empty](docs/screenshots/04_chat_empty.png) |
+| **HITL — query rewrite decision** — user chooses original vs. rewritten query before any cost is incurred | **Chat — fresh response** with full routing transparency |
+| ![Rewrite decision](docs/screenshots/05_rewrite_decision.png) | ![Chat response](docs/screenshots/06_chat_response.png) |
+| **Analytics dashboard** — cost, tier distribution, latency, and cache hit rate, all live | **History** — per-session breakdown with full conversation replay |
+| ![Analytics](docs/screenshots/07_analytics.png) | ![History](docs/screenshots/08_history.png) |
+| **Settings — cache thresholds** | **Settings — model tiers & query rewriting mode** |
+| ![Settings cache](docs/screenshots/02_settings_cache.png) | ![Settings tiers](docs/screenshots/03_settings_tiers.png) |
 
 ---
 

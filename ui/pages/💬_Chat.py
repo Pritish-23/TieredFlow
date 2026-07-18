@@ -3,10 +3,11 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
 from memory.store import get_store
+
 get_store()  # ensures DB + tables exist regardless of which page loads first
 
-import uuid
 import time
+import uuid
 
 import streamlit as st
 from langgraph.types import Command
@@ -79,7 +80,8 @@ st.divider()
 
 # ── Empty state greeting ────────────────────────────────────────────────────
 if not st.session_state.messages:
-    st.markdown("""
+    st.markdown(
+        """
     <div style="text-align: center; padding: 60px 20px; opacity: 0.85;">
         <div style="font-size: 48px; margin-bottom: 16px;">🎛️</div>
         <div style="font-size: 24px; font-weight: 600; margin-bottom: 8px;">
@@ -90,15 +92,17 @@ if not st.session_state.messages:
             check the cache, or pull in the right tool (search, Wikipedia, weather, and more).
         </div>
     </div>
-    """, unsafe_allow_html=True)
+    """,
+        unsafe_allow_html=True,
+    )
 
     col1, col2, col3 = st.columns(3)
     with col1:
-        st.info("💡 **Try:** \"What is deep learning?\"")
+        st.info('💡 **Try:** "What is deep learning?"')
     with col2:
-        st.info("🧮 **Try:** \"Calculate 45 * 12 + 8\"")
+        st.info('🧮 **Try:** "Calculate 45 * 12 + 8"')
     with col3:
-        st.info("🌤️ **Try:** \"What's the weather in Mumbai?\"")
+        st.info('🌤️ **Try:** "What\'s the weather in Mumbai?"')
 
 
 # ── Chat history ──────────────────────────────────────────────────────────────
@@ -328,7 +332,10 @@ if st.session_state.get("_last_result"):
     query = st.session_state._last_query
 
     with st.chat_message("assistant"):
-        response = result.get("final_response") or "⚠️ No response was generated. Please try rephrasing your query."
+        response = (
+            result.get("final_response")
+            or "⚠️ No response was generated. Please try rephrasing your query."
+        )
 
         if result.get("served_from_cache"):
             st.markdown(response)

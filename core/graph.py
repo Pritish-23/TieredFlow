@@ -1,6 +1,6 @@
 import sqlite3
-from pathlib import Path
 import tempfile
+from pathlib import Path
 
 DB_PATH = str(Path(tempfile.gettempdir()) / "tieredflow.db")
 
@@ -33,6 +33,7 @@ from nodes.router_node import (
     router_node,
     task_classifier_node,
 )
+
 
 def build_graph():
     builder = StateGraph(TieredFlowState)
