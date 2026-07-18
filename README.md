@@ -239,7 +239,3 @@ Full breakdown available in [`eval/results/eval_results.csv`](eval/results/eval_
 | ![Settings cache](docs/screenshots/02_settings_cache.png) | ![Settings tiers](docs/screenshots/03_settings_tiers.png) |
 
 ---
-
-## 📄 License
-
-MIT
